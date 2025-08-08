@@ -1,0 +1,418 @@
+---
+title: "Data Visualization Techniques"
+author: "Laura Rodríguez "
+output: html_document
+---
+
+<div class = text-justify>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
+```
+
+
+# Basic Charts
+## EXERCISE 1
+### Analyze the data and create any chart you find interesting.
+
+
+### libraries 
+```{r message=FALSE, warning=FALSE}
+
+library (dplyr)
+library (paletteer)
+library(ggplot2)
+
+```
+
+
+```{r}
+
+datos <- read.csv("casos_hosp_uci_def_sexo_edad_provres.csv", sep = ",") 
+summary(datos)
+
+
+
+```
+
+```{r}
+
+
+datos_filtrados <- subset(datos, sexo != "NC" & grupo_edad != "NC")
+
+
+resumen_datos <- aggregate(num_hosp ~ sexo + grupo_edad, datos_filtrados, sum)
+
+
+barplot(resumen_datos$num_hosp, beside = TRUE, col = c("gold2", "darkblue"), 
+        main = "Número de Hospitalizaciones por Sexo y Grupo de Edad", 
+        xlab = "Grupo de Edad", ylab = "Número de Hospitalizaciones",
+        legend.text = unique(resumen_datos$sexo), 
+        args.legend = list(title = "Sexo", x = "top"),
+        names.arg = resumen_datos$grupo_edad, 
+        cex.names = 0.7,
+        ylim = c(0,80000)) 
+
+# Final Test – It Works
+
+```
+
+# Bar Chart
+## EXERCISE 2, PART 1
+
+### Libraries
+
+```{r message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(tidyverse)
+library(paletteer)
+library(data.table)
+library(ggthemes)
+library(dplyr)
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+datos<-diamonds
+
+
+head(datos)
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+datos <- diamonds %>%
+  group_by(cut, color) %>%
+  summarise(media_price = mean(price, na.rm = TRUE))
+
+head(datos)
+
+
+```
+
+```{r}
+
+ggplot(datos, aes(x=cut, y=media_price, fill= color))+
+  geom_col()
+
+```
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+
+ggplot(datos, aes(x=cut, y=media_price, fill= color))+   
+  geom_col()+
+  
+labs(x= "Type of cut", y= "Means of the prices") 
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+
+ggplot(datos, aes(x=cut, y=media_price, fill= color))+  
+  scale_x_discrete(limits = c("Fair", "Good", "Ideal", "Premium", "Very Good"))+ 
+  geom_col()+
+  
+  
+labs(x= "Type of cut", y= "Means of the prices")+
+  theme(axis.title = element_text(size= 12, color = "black"))+
+  
+  theme(axis.text = element_text(color= "black", size= 10))+ 
+  
+  guides(fill=guide_legend(title = "Colors"))
+
+```
+
+```{r}
+
+ggplot(datos, aes(x=cut, y=media_price, fill= color))+
+  scale_x_discrete(limits = c("Fair", "Good", "Ideal", "Premium", "Very Good"))+
+
+  geom_col()+
+  
+  guides(fill=guide_legend(title = "Colors"))+
+  
+  scale_fill_manual(values= paletteer_c("grDevices::Dynamic", 7))+ 
+  
+  
+labs(x= "Type of cut", y= "Means of the prices")+
+  theme(axis.title = element_text(size= 12, color = "black"))+
+  
+  theme(axis.text = element_text(color= "black", size= 10))
+
+
+# Final Test – It Works
+```
+
+
+## **EXERCISE 2, PART 2**
+
+### Libraries
+```{r message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(tidyverse)
+library(paletteer)
+library(dplyr)
+library(data.table)
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+datos<-diamonds 
+head(datos)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+datos <- diamonds %>%
+  group_by(cut, color) %>%
+  summarise(media_price = mean(price, na.rm = TRUE))
+
+head(datos)
+
+```
+
+```{r}
+
+ggplot(datos, aes(x=reorder(cut, media_price), y=media_price, fill= color))+
+  scale_x_discrete(limits = c("Fair", "Good", "Ideal", "Premium", "Very Good"))+
+  geom_bar(stat= "identity", position = "dodge")+
+  
+  scale_fill_brewer(palette = "Pastel2")+
+  
+  
+  labs(x="Type of cut", y="Means of the prices")+
+  theme(axis.title = element_text(size= 12, color = "black"))+
+  
+  theme(axis.text = element_text(color= "black", size= 8))+
+  guides(fill=guide_legend(title = "Colors"))
+
+# Final Test – It Works
+
+```
+
+
+
+### **EXERCISE 3**
+
+
+### libraries
+```{r message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(tidyverse)
+library(paletteer)
+library(data.table)
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+Temperatures=read.csv("Temperatures.csv")
+
+datos<-Temperatures
+
+head(datos)
+
+ggplot(datos, aes(x=Year, y=Variation, fill=Positive))+
+  geom_bar(stat= "identity", position = "dodge") 
+
+ggplot(datos, aes(x=Year, y=Variation, fill=Positive, width=0.8))+ 
+  geom_bar(stat= "identity", position = "dodge")+
+  scale_fill_manual(values = c("blue", "red"))
+
+```
+
+
+### __Graph Interpretation:__
+
+### Temperature variation with respect to the mean between the years 1900 and 2000.
+
+For the year 1900, temperature variation showed negative values compared to the mean, decreasing steadily until reaching approximately twice the initial variation by 1913, exceeding the 95% confidence interval.
+
+For the period 1914–1920, temperature variation remained below the initial variation. It was not until a decade later, in 1934, that the first positive temperature variation values appeared, trending upward until 1944; however, with a 68% confidence interval for that same year.
+
+Between 1951 and 1971, temperature variation values were inconsistent, fluctuating between -0.017 and 0.007, with lower confidence intervals under 55%.
+
+From 1972 onwards, temperature variation gradually increased in a positive manner; however, it had a confidence interval below 30%.
+
+
+
+
+
+# __Line Chart__
+
+
+### **EXERCISE 4**
+
+
+### libraries
+```{r message=FALSE, warning=FALSE}
+
+library(babynames)
+library(ggrepel)
+library(tidyverse)
+library(ggplot2)
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+niño1 <- "Laura"
+niño2 <- "Rose"
+
+
+```
+
+```{r}
+
+View(babynames)
+
+```
+
+
+```{r}
+
+datos_nombres <- babynames %>%
+  filter(year>=2000 & year <=2010)
+
+datos_nombre_select <- datos_nombres %>%
+  filter(name %in% c(niño1, niño2)) 
+
+datos_sexo_select <- datos_nombre_select %>%
+  filter(sex == "F") 
+
+
+```
+
+
+```{r}
+
+ggplot(datos_sexo_select, aes(x=year, y=n, color= name))+
+  geom_line()+
+  guides(color=guide_legend(title = "Kids names"))+
+  scale_color_manual(values = c("Laura" = "seagreen3", "Rose" = "lightpink2"))+
+  labs(x= "Año", y= "Número de Nacimientos", title = "Tendencia de Nombres, periodo 2000-2010")+
+  theme(axis.title = element_text(size= 12, color = "black"),
+        axis.text = element_text(color= "black", size= 10))+
+  scale_x_continuous(breaks = c(2000,2002,2004,2006,2008,2010))+
+  
+  theme_classic()
+
+# Final Test – It Works
+
+```
+
+
+
+# __Scatter Plot__
+
+
+### **EXERCISE 5**
+
+
+### libraries
+```{r message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(tidyverse)
+library(data.table)
+library(paletteer)
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+datos=read.csv2("EsperanzaVidayNatalidadCA.csv")
+
+head(datos)
+
+
+datos <- fread("EsperanzaVidayNatalidadCA.csv", encoding = "Latin-1")
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+datos$EsperanzaVida <- gsub(",", ".", datos$EsperanzaVida)
+datos$EsperanzaVida <- as.numeric(datos$EsperanzaVida)
+datos$Natalidad <- gsub(",", ".", datos$Natalidad)
+datos$Natalidad <- as.numeric(datos$Natalidad)
+datos <- datos[-c(20), ]
+
+```
+
+```{r}
+
+ggplot(datos, aes(x = EsperanzaVida, y = Natalidad, color = ComunidadesAutonomas)) +
+  geom_point() +
+  theme(legend.position = "none") +
+  geom_text(aes(label = ComunidadesAutonomas), size=3)
+
+# Final Test – It Works
+```
+
+
+
+# __Custom Chart __
+
+
+### **EXERCISE 6**
+
+
+### libraries
+```{r message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(gcookbook)
+library(paletteer)
+library(areaplot)
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+head(uspopage) 
+
+```
+
+```{r}
+
+uspopage_years<-aggregate(Thousands ~ Year, data=uspopage, sum)
+head(uspopage_years)
+
+```
+
+```{r}
+
+ggplot(uspopage, aes(x=Year, y=Thousands, fill= AgeGroup))+
+  geom_area()
+
+```
+
+
+
+```{r}
+
+ggplot(uspopage, aes(x = Year, y = Thousands, fill = AgeGroup)) +
+  geom_area(color = NA, alpha = 0.6) +
+  scale_fill_manual(values = paletteer_c("grDevices::Inferno", 8)) +
+  labs(title = "Población Estadounidense por grupo de edad",  
+       x = "Year", y = "Thousands", 
+       fill = "Grupos de Edad") +
+  theme(plot.title = element_text(face = "italic", hjust = 0.5))
+
+# Final Test – It Works
+
+```
+
+</div >
