@@ -1,0 +1,342 @@
+---
+title: "Entregable- Mapas"
+author: "Laura Rodríguez"
+date: "2023-11-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+
+#Entregable - Prof. Nueva
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+library(maps)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+library(paletteer)
+library(ggtext)
+library(sf)
+
+```
+
+
+
+### First, we add the set of countries by creating a dataframe...
+
+
+```{r}
+
+
+europa <- c( "Portugal", "Spain", "France", "Switzerland", "Germany",    "Austria", "UK", "Netherlands", "Denmark", "Poland", "Italy",  "Croatia", "Slovenia", "Hungary", "Slovakia",  "Czech republic", "Sweden","Finland", "Norway","Estonia", "Lithuania", "Ukraine",    "Belarus", "Romania",
+"Belgium", "Bulgaria", "Greece", "Moldova", "Latvia","Luxembourg","Serbia", "Bosnia and Herzegovina", "North Macedonia", "Montenegro", "Albania","Ireland","Kosovo" )
+
+
+```
+
+
+### We create another dataframe for...
+
+```{r}
+
+
+datos<-map_data('world', region= europa)
+
+# Our df is called Europa, generating the dataset data_Europa
+
+
+
+```
+
+
+```{r}
+
+head(datos, 5)
+
+# Show the dataset with size 3, so only 3 rows are visible
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+datos_nombres <- datos %>% group_by(region) %>% summarise(
+  lat=mean(lat),
+  long=mean(long))
+
+head(datos_nombres)
+
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon() 
+
+```
+
+```{r}
+
+ggplot(data = datos, aes(x = long, y = lat, group = group)) + 
+  geom_polygon() 
+
+```
+
+```{r}
+
+coord= map_data('world', region=europa) %>%
+  group_by(region)%>%
+  summarize(long = mean(long, na.rm=T), lat=mean(lat, na.rm=T), 
+            group=group)
+coord<-coord %>%
+  distinct(region, long, lat, .keep_all=TRUE)
+head(coord)
+
+# We add the capitals
+capitales_nombres <-  c("Lisboa","Madrid", "Paris","Roma")
+capitales_long <- c(-9.1333300, -3.70256, 2.3488, 11.71819)
+capitales_lat <- c(38.71667,40.4165, 48.85341,45.58383)
+
+# Extract only the names of the countries
+paises_nombres <- datos %>% group_by(region) %>% summarise(
+  lat=mean(lat),
+  long=mean(long))
+
+
+
+```
+
+
+### a) The name of all countries should appear in the corresponding place (size 3)
+
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group= group, col=group, fill=region)) +
+ geom_polygon()+
+  geom_text(data=paises_nombres, aes(x = long, y = lat, label=region), color = "black", size=3, check_overlap = T) 
+
+```
+
+```{r message=FALSE, warning=FALSE}
+
+# g) Add 4 capitals (size 4 in red)
+  geom_point(data=capitales, aes(x = long, y = lat), color = "red", size = 1) + 
+  geom_text(data=capitales, aes(x = long, y = lat, label=nombre), color = "red", size=4, check_overlap = T) +
+ 
+```
+  
+  
+### b) Each country should appear in a different color
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon() 
+
+```
+
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon() +
+ geom_text(data = europa, aes(x = long, y = lat, label = region), size = 3, color = "red")
+
+```
+
+### c) The border line of each country should be white
+
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon(color = "white") 
+
+```
+
+
+
+### d) X-axis label = Longitude, format: size 8, blue, rotated 45 degrees
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon(color = "white")+
+  
+theme(axis.text.x = element_text(
+  size= 8, color= "blue3", angle = 45, hjust = 1))
+    
+```
+
+
+
+### e) Y-axis label = Latitude, format: size 8, pink
+
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon(color = "white")+
+  
+theme(axis.text.x = element_text(
+  size= 8, color= "blue3", angle = 45, hjust = 1))+
+theme(axis.text.y= element_text(size= 8, color= "pink3"))
+
+```
+
+
+
+### f) Remove legend
+```{r}
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+coord_fixed() +
+ geom_polygon(color = "white")+
+  
+theme(axis.text.x = element_text(
+  size= 8, color= "blue3", angle = 45, hjust = 1))+
+theme(axis.text.y= element_text(size= 8, color= "pink3"))+
+  
+
+theme(legend.position = "none")
+  
+# Using guides(fill = FALSE) also works to remove the legend
+
+```
+
+
+
+```{r}
+
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+coord_fixed() +
+ geom_polygon(color = "white")+
+  
+theme(axis.text.x = element_text(
+  size= 8, color= "blue3", angle = 45, hjust = 1))+
+theme(axis.text.y= element_text(size= 8, color= "pink3"))+
+scale_fill_manual(values=paletteer_c("ggthemes::Red", 50))+
+theme(legend.position = "none")
+
+
+```
+
+
+
+
+
+### g) Add 4 capitals (size 4 in red): "Lisbon", "Madrid", "Paris", "Rome" with coordinates respectively:  
+# Longitude: -9.1333300, -3.70256, 2.3488, 11.71819  
+# Latitude: 38.71667, 40.4165, 48.85341, 45.58383  
+# Add a red point corresponding to each of the 4 capitals
+
+```{r}
+
+# We will create a vector for the names and coordinates of the capitals 
+
+capitals_names <-c("Lisboa","Madrid", "Paris","Roma")
+
+capitals_coord <-data.frame(long= c(-9.1333300, -3.70256, 2.3488, 11.71819) , 
+                            lat= c(38.71667,40.4165, 48.85341,45.58383 ))
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+coord_fixed() +
+ geom_polygon(color = "white")+
+  
+theme(axis.text.x = element_text(
+  size= 8, color= "blue3", angle = 45, hjust = 1))+
+theme(axis.text.y= element_text(size= 8, color= "pink3"))+
+
+theme(legend.position = "none")
+```
+
+```{r}
+
+# We place the names on the map with font size 4 and a red point
+
+
+names_coord <-data.frame(long= c(-9.1333300, -3.70256, 2.3488, 11.71819) , 
+                          lat= c(38.71667,40.4165, 48.85341,45.58383 ),
+                          capitals= c("Lisboa","Madrid", "Paris","Roma"))
+
+ggplot(names_coord,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+coord_fixed() +
+geom_point(data = names_coord, aes(long, lat), color = "red") +
+theme(axis.text.x = element_text(
+  size= 8, color= "blue3", angle = 45, hjust = 1))+
+theme(axis.text.y= element_text(size= 8, color= "pink3"))+
+
+theme(legend.position = "none")+
+  
+  geom_point(data=names_coord, aes(long, lat, group = group),color=
+"red") +
+ annotate("text", x=names_coord$long, y=europa$lat, 
+label=names_coord$region, size=3, color="Red")
+
+
+
+```
+
+
+### h) Remove the grid and the map background
+
+### i) Change the color palette
+```{r message=FALSE, warning=FALSE}
+
+
+capitales <- data.frame (long= c(-9.13333, -3.70256, 2.3488, 
+11.71819), lat = c (38.7166,40.4165, 48.85341,45.583835), 
+      ciudades <- c("Lisboa","Madrid", "Paris","Roma"))%>%
+  
+ summarise(long = long, lat = lat,region = ciudades, group =c(1,1,1,1))
+
+ggplot(datos,aes(x=long, y = lat, group = group, col = group, fill =
+region)) +
+ geom_polygon(color = "white") + xlab("Longitud")+ylab("Latitud") +
+ geom_text(data = coord, aes(long, lat, label = region, group =
+group), size = 3, color= "Black")+
+ theme( axis.text.x = element_text(size = 8,colour = "blue",angle =
+45),
+ axis.text.y = element_text(size = 8, colour = "pink")) +
+ theme(legend.position = "none")+
+ geom_point(data=capitales, aes(long, lat, group = group),color=
+"red") +
+ annotate("text", x=capitales$long, y=capitales$lat, 
+label=capitales$region, size=3, color="Red")
+
+
+
+```
+
+
+
