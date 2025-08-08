@@ -1,0 +1,185 @@
+---
+title: "Diagrama de Arboles"
+author: "Laura Rodríguez"
+date: "2024-01-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#Libraries 
+
+library(rpart)
+library(tidyverse)
+library(rpart)
+library(rpart.plot)
+library(rattle)
+library(titanic)
+library(readr)
+library(paletteer)
+
+
+
+```
+
+
+```{r}
+
+#Cargando datos
+
+heart <- read.csv("heart.csv")
+head(heart)
+
+```
+
+
+```{r}
+# Variables contained in the Dataset
+
+# Age: patient’s age [years]
+# 
+# Sex: patient’s sex [M: Male, F: Female]
+# 
+# ChestPainType: type of chest pain [TA: Typical angina, ATA: Atypical angina, NAP: Non-anginal pain, ASY: Asymptomatic]
+# 
+# RestingBP: resting blood pressure [mm Hg]
+# 
+# Cholesterol: serum cholesterol [mg/dl]
+# 
+# FastingBS: fasting blood sugar [1: if FastingBS > 120 mg/dl, 0: otherwise]
+# 
+# RestingECG: resting electrocardiogram results [Normal: Normal, ST: ST-T wave abnormality (inversion of T wave and/or ST elevation or depression > 0.05 mV), LVH: probable or definite left ventricular hypertrophy according to Estes criteria]
+# 
+# MaxHR: maximum heart rate achieved [Numeric value between 60 and 202]
+# 
+# ExerciseAngina: exercise-induced angina [S: yes, N: no]
+# 
+# Oldpeak: oldpeak = ST depression [Numeric value measured in depression]
+# 
+# ST_Slope: slope of the peak exercise ST segment [Up: upward slope, Flat: flat, Down: downward slope]
+# 
+# HeartDisease: output class [1: heart disease, 0: normal]
+```
+
+
+```{r}
+
+#Data Structure
+
+str(heart)
+
+```
+
+```{r}
+
+summary(heart)
+
+```
+
+```{r}
+
+# Data Structure
+# Some interpretations
+# The minimum age of the people evaluated in the dataset is 28 years, and the maximum age is 77 years.
+# 
+# The average blood pressure is 132.4 mm Hg.
+# 
+# 75% of the evaluated individuals have cholesterol levels less than or equal to 267 mg/dl.
+
+```
+
+```{r}
+#Detecting Null Values
+
+apply(heart, 2, function(x) length(which(is.na(x))))
+
+```
+
+```{r}
+#There are no null values in any of the studied variables.
+
+```
+
+```{r}  
+
+#no poner en el pdf
+
+#Transforming values to 0 and 1, because decission tree 
+
+
+heart$Sex<-ifelse(heart$Sex=="M",1,0)
+heart$ExerciseAngina <- ifelse(heart$ExerciseAngina == "Y", 1,0)
+heart$ChestPainType = factor(heart$ChestPainType, levels = c('TA','ATA','NAP','ASY'),
+                                    labels = c('0','1','2','3'))
+heart$RestingECG = factor(heart$RestingECG, levels = c('Normal','ST','LVH'),
+                                    labels = c('0','1','2'))
+heart$ST_Slope = factor(heart$ST_Slope, levels = c('Up','Flat','Down'),
+                                    labels = c('0','1','2'))
+
+
+```
+
+
+```{r}
+
+#Converting variables to factors and numeric types
+
+heart$Sex <- as.factor(heart$Sex)
+heart$ExerciseAngina <- as.factor(heart$ExerciseAngina)
+heart$FastingBS <- as.factor(heart$FastingBS)
+heart$HeartDisease <- as.factor(heart$HeartDisease)
+heart$RestingBP <- as.numeric(heart$RestingBP)
+heart$Age <- as.numeric(heart$Age)
+heart$Cholesterol <- as.numeric(heart$Cholesterol)
+heart$MaxHR <- as.numeric(heart$MaxHR)
+
+
+```
+
+
+
+
+
+```{r}
+
+# Creating Model
+
+tree1 <- rpart(HeartDisease ~ .,
+    data = heart, method = "class")
+
+
+
+
+rpart.plot(tree1, extra = 104,
+           box.palette = "RdPu",
+           branch.lty = 4,
+           branch.col = "indianred2",                                       #Color line
+           branch.lwd = 4,                                                  # #thickness of the edges connecting the nodes
+           shadow.col = "slateblue1",
+           nn = TRUE, type = 4, main = "Heart Disease",
+           cex = 0.65,
+           col = "mediumorchid4")
+
+```
+
+```{r}
+
+
+
+rpart.plot(tree1, extra = 104,
+           box.palette = "BuPu",
+           branch.lty = 4,
+           branch.col = "darkslategray3",                                                              #Color line
+           branch.lwd = 4,                                                                            # #thickness of the edges connecting the nodes
+           shadow.col = "slateblue1",
+           nn = TRUE, type = 4, main = "Heart Disease",
+           cex = 0.65,
+           col = "mediumorchid4")
+
+```
+
+
