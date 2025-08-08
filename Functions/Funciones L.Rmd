@@ -1,0 +1,296 @@
+---
+title: "Functions"
+author: "Laura Rodríguez"
+date: "2023-12-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+
+library(ggplot2)
+
+# Create a data frame with the data from the standard normal distribution
+mu <- 0
+sigma <- 1
+
+x <- seq(-4, 4, by = 0.01)
+
+y <- dnorm(x, mu, sigma)
+
+df <- data.frame(x = x, y = y)
+
+# Create a data frame with the data from the normal distribution with mean 1 and standard deviation 1
+mu <- 1
+sigma <- 1
+
+x <- seq(-4, 4, by = 0.01)
+
+y <- dnorm(x, mu, sigma)
+
+df_1 <- data.frame(x = x, y = y)
+
+
+```
+
+
+
+```{r}
+
+ggplot(data = df, aes(x = x, y = y)) +
+  geom_line(colour = "blue") +
+  geom_line(data = df_1, aes(x = x, y = y), colour = "red") +
+  ggtitle("Normal distribution") +
+  xlab("Value of X") +
+  ylab("Probability")
+
+
+
+```
+
+```{r}
+ggplot(data = df, aes(x = x, y = y)) +
+  geom_line(colour = "black") +
+  geom_line(data = df_1, aes(x = x, y = y), colour = "black") +
+  ggtitle("Normal distribution") +
+  xlab("Value of X") +
+  ylab("Probability")
+
+```
+
+
+```{r}
+
+
+ggplot(data = df, aes(x = x, y = y)) +
+  geom_line(colour = "black") +
+  geom_line(data = df_1, aes(x = x, y = y), colour = "black") +
+  ggtitle("Normal distribution") +
+  xlab("Value of X") +
+  ylab("Probability") +
+  geom_text(aes(x = 0, y = 0.5), label = "N(0,1)", colour = "blue") +
+  geom_text(aes(x = 1, y = 0.5), label = "N(1,1)", colour = "black")
+
+```
+
+```{r}
+
+
+# Library ggplot2
+library(ggplot2)
+
+# Create a data frame with the data from the standard normal distribution
+mu <- 0
+sigma <- 1
+
+x <- seq(-4, 4, by = 0.01)
+
+y <- dnorm(x, mu, sigma)
+
+df <- data.frame(x = x, y = y)
+
+# Create a data frame with the data from the normal distribution with mean 1 and standard deviation 1
+mu <- 1
+sigma <- 1
+
+x <- seq(-4, 4, by = 0.01)
+
+y <- dnorm(x, mu, sigma)
+
+df_1 <- data.frame(x = x, y = y)
+
+# Crea el gráfico
+ggplot(data = df, aes(x = x, y = y)) +
+  geom_line(colour = "black") +
+  geom_line(data = df_1, aes(x = x, y = y), colour = "black") +
+  ggtitle("Distribución normal") +
+  xlab("Value of X") +
+  ylab("Probability") +
+  geom_text(aes(x = 0, y = 0.5), label = "N(0,1)", colour = "blue") +
+  geom_text(aes(x = 1, y = 0.5), label = "N(1,1)", colour = "black")
+
+```
+
+```{r}
+
+library(ggplot2)
+```
+
+
+```{r}
+funcion = function(x){
+y <- dnorm(x)
+y [ x > (-0.5)|x < (-1) ]<- NA
+return (y)
+}
+funcione = function(x){
+y <- dnorm(x)
+y [ x < (0.5)|x > (1) ] <- NA
+return (y)
+}
+```
+
+
+
+```{r}
+
+# Drawing the normal distribution in the range (-2, 2)
+ggplot(data.frame(x=c(-2,2)), aes(x=x))+ stat_function(fun = dnorm, linetype=2)
+
+```
+
+```{r}
+# Adding a vertical line at x=0
+ggplot(data.frame(x=c(-2,2)), aes(x=x))+ stat_function(fun = dnorm, linetype=2)+
+geom_segment(x=0, y=0,xend = 0, yend = 0.4, linetype=1,color ="pink",lwd=1)
+
+
+```
+
+```{r}
+
+# Coloring the area under the curve
+ggplot(data.frame(x=c(-2,2)), aes(x=x))+ stat_function(fun = dnorm, linetype=2)+
+geom_segment(x=0, y=0,xend = 0, yend = 0.4, linetype=1,color ="pink",lwd=1)+
+stat_function(fun= funcion, geom = "area", fill = "pink")+
+stat_function(fun= funcione, geom = "area", fill = "blue")
+
+```
+
+```{r}
+
+# Drawing the second distribution
+ggplot(data.frame(x=c(-2,2)), aes(x=x))+ stat_function(fun = dnorm, linetype=2)+
+geom_segment(x=0, y=0,xend = 0, yend = 0.4, linetype=1,color ="pink",lwd=1)+
+stat_function(fun= funcion, geom = "area", fill = "pink") +
+stat_function(fun= funcione, geom = "area", fill = "blue")+
+geom_segment(x=1, y=0,xend = 1, yend = 0.4, linetype=1,color ="black",lwd=0.5)+
+stat_function(fun = dnorm, args = list(mean=1,sd=1))
+
+```
+
+```{r}
+
+#Adding pointing arrow
+ggplot(data.frame(x=c(-2,2)), aes(x=x))+ stat_function(fun = dnorm, linetype=2)+
+geom_segment(x=0, y=0,xend = 0, yend = 0.4, linetype=1,color ="pink",lwd=1)+
+stat_function(fun= funcion, geom = "area", fill = "pink") +
+stat_function(fun= funcione, geom = "area", fill = "blue")+
+geom_segment(x=1, y=0,xend = 1, yend = 0.4, linetype=1,color ="black",lwd=0.5)+
+stat_function(fun = dnorm, args = list(mean=1,sd=1))+
+annotate("curve", x=-1, y=0.34, xend=-1, yend = 0.15,
+arrow = arrow(length = unit(0.5,"cm")), lwd = 1, col = "red", linetype = 1)
+```
+
+```{r}
+
+# Adding the mathematical function and remaining parameters according to the format
+
+ggplot(data.frame(x=c(-2,2)), aes(x=x))+ stat_function(fun = dnorm, linetype=2)+
+geom_segment(x=0, y=0,xend = 0, yend = 0.4, linetype=1,color ="pink",lwd=1)+
+stat_function(fun= funcion, geom = "area", fill = "pink") +
+stat_function(fun= funcione, geom = "area", fill = "blue")+
+geom_segment(x=1, y=0,xend = 1, yend = 0.4, linetype=1,color ="black",lwd=0.5)+
+stat_function(fun = dnorm, args = list(mean=1,sd=1))+
+annotate("curve", x=-1, y=0.34, xend=-1, yend = 0.15,
+arrow = arrow(length = unit(0.5,"cm")), lwd = 1, col = "red", linetype = 1)+
+annotate("text", x=-1, y=0.38, label = "P(-1<x<0.5)")+
+ggtitle("Distribución Normal")+
+xlab("Value of X")+ ylab("Probability")+
+theme(panel.background = element_blank(),
+axis.text.x = element_text(color = "Darkblue", size = 12, angle = 90),
+axis.text.y = element_text(color = "Darkblue", size = 12),
+axis.title.x = element_text(size = 12,face = "bold"),
+axis.title.y = element_text(size = 12,face = "bold"),
+axis.ticks.y = element_blank(), axis.ticks.x = element_blank()) +
+geom_hline(yintercept = 0,color="red",lwd= 1, linetype=1)
+```
+
+
+```{r}
+
+library(dplyr)
+library(paletteer)
+library(ggplot2)
+library(maps)
+ggplot(data.frame(x = c(-3, 5)), aes(x = x)) +
+  theme_classic()+
+  
+  #funcion 1
+  stat_function(fun = dnorm, geom='line',args = list(mean = 0, sd = 1), color = "pink", lty = 2) +
+  #funcion area 1
+  stat_function(fun = dnorm, geom='area',args = list(mean = 0, sd = 1), fill = "pink", lty = 1, xlim =c(-.5,0)) +
+  #funcion area 2
+  stat_function(fun = dnorm, geom='area',args = list(mean = 1, sd = 1), fill = "blue", lty = 1, xlim =c(.5,1)) +
+  #funcion 2
+  scale_x_continuous(expand=c(0,0),breaks = c(0,1))+
+  stat_function(fun = dnorm, geom='line',args = list(mean = 1, sd = 1), color = "blue", lty = 1)+
+  
+  # Graph limits, reducing the margin on the x-axis to match the example
+
+  coord_cartesian(ylim=c(0.019, 0.4))+
+  xlab("Value of X")+
+  ylab("Probability")+
+  #funcion anotada en el grafico
+  annotate("text", x = .5, y = .41, parse = TRUE,
+           label = "'P(-0.5<X<0)='* P(0.5<1)", color = "black", size = 3)+
+  #Add a graph legend
+  annotate("text", x= 3, y=0.3, label = "N(0, 1)", parse = TRUE, color = "pink", size = 3)+
+  annotate("text", x= 3, y=0.27, label = "N(1, 1)", parse = TRUE, color = "blue", size = 3)+
+  #add pointing arrow
+  geom_segment(x = 4, y = 0.3, xend = 3.5, yend =.3, color = "pink", lwd=1, lty= 4)+
+  geom_segment(x = 4, y = 0.27, xend = 3.5, yend =.27, color = "blue", lwd=1, lty= 1)+
+  
+  
+  
+#title  
+  ggtitle("Distribucion Normal")+
+#format graph  
+  theme(axis.line.x.bottom=element_line(color="red"),
+        axis.line.y.left = element_blank(),
+        axis.text.x = element_text(color="blue"),
+        axis.text.y = element_text(color="blue"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(size= 10)) +
+#point arrow
+  geom_curve(x = 1.2, y = .4,
+               xend = 1.2, yend = .25,
+               color = "blue",
+               arrow = arrow(length=unit(.45,"cm")),
+             curvature = -.5,
+             lty = 2,size = .8) +
+  
+    geom_curve(x = -.2, y = .4,
+               xend = -.6, yend = .25,
+               color = "pink",
+               arrow = arrow(length=unit(.30,"cm")),
+             curvature = .5,
+             lty = 1,size = .8) 
+
+```
+
